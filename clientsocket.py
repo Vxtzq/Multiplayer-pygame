@@ -26,6 +26,7 @@ def main():
             connected = False
         else:
             msg = client.recv(SIZE).decode(FORMAT)
+            msg = list(msg)
             print(f"[SERVER] {msg}")
         
             
