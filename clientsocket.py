@@ -26,7 +26,7 @@ def main():
             connected = False
         else:
             msg = client.recv(SIZE).decode(FORMAT)
-            msg = list(msg)
+            msg = msg.strip('][').split(', ')
             print(f"[SERVER] {msg}")
         
             

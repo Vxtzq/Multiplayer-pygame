@@ -40,9 +40,9 @@ def handle_client(conn, addr):
                 clientposes.append((addr[1],msg))
         msg = ""
         for clientpos in clientposes:
-            print(clientpos)
+            print(str(clientpos))
             msg = msg+ str(clientpos) + ","
-        conn.send(bytes(str(msg),"utf-8"))
+        conn.send(str(clientposes).encode(FORMAT))
 
     conn.close()
 
