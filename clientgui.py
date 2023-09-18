@@ -2,6 +2,7 @@ import sys
  
 import pygame
 from pygame.locals import *
+from clientsocket import *
  
 pygame.init()
  
@@ -33,20 +34,35 @@ class Player():
     def update(self):
         self.move()
         self.draw()
+class Entity():
+    def __init__(self,x, y,ID):
+        self.x = x
+        self.y = y
+        self.ID = ID
+    def draw(self):
+        self.rect = Rect(self.x,self.y,40,40)
+        pygame.draw.rect(screen, (255,0,0), self.rect)
+    def update(self):
+        self.draw()
             
 player = Player(0,0)
+
 # Game loop.
 def run():
-    screen.fill((0, 0, 0))
+    
+    
+    
     xtosend,ytosend = player.x, player.y
     for event in pygame.event.get():
         if event.type == QUIT:
+            client.send("quit".encode(FORMAT))
             pygame.quit()
             sys.exit()
+    
 
-
+    
     # Update.
-    player.update()
+    
     
     
     

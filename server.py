@@ -1,6 +1,6 @@
 import socket
 import threading
-
+import wikipedia
 
 IP = socket.gethostbyname(socket.gethostname())
 PORT = 5566
@@ -9,10 +9,8 @@ SIZE = 1024
 FORMAT = "utf-8"
 DISCONNECT_MSG = "!DISCONNECT"
 nb_clients = 0
-
+firstconnectionlist = []
 clientposes = []
-dontadd = 0
-index = 0
 
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
@@ -22,27 +20,34 @@ def handle_client(conn, addr):
         msg = conn.recv(SIZE).decode(FORMAT)
         if msg == DISCONNECT_MSG:
             connected = False
-        if str(msg)[0] == "c":
+        if msg != "":
             
-            #print(f"[{addr}] {msg}")
-            msg = msg.replace("c","")
-            dontadd = 0
-            index = 0
-            for clientpos in clientposes:
-                if clientpos[0] == addr[1]:
-                    dontadd = 1
-                if clientpos[1] != msg:
-                    if clientpos[0] == addr[1]:
-                        clientposes[index] = (clientposes[index][0],msg)
-                    
-                index +=1
-            if dontadd == 0:
-                clientposes.append((addr[1],msg))
-        msg = ""
-        for clientpos in clientposes:
-            print(str(clientpos))
-            msg = msg+ str(clientpos) + ","
-        conn.send(str(clientposes).encode(FORMAT))
+            if str(msg)[0] == "c":
+                
+                #print(f"[{addr}] {msg}")
+                msg = msg.replace("c","")
+                
+                if [addr[1],msg] in clientposes:
+                    pass
+                else:
+                    index = 0
+                    dontadd = 0
+                    for clientpos in clientposes:
+                        if clientpos[0] == addr[1]:
+                            clientposes[index] =[addr[1],str(msg)]
+                            print(clientposes)
+                            dontadd = 1
+                        index += 1
+                    if dontadd == 0:
+                        clientposes.append([addr[1],str(msg)])
+        #print(str(clientposes))
+            if addr[1] in firstconnectionlist:
+                conn.send(bytes(str(clientposes),"utf-8"))
+            else:
+                print("sus")
+                conn.send(bytes("first"+str(addr[1]),"utf-8"))
+                firstconnectionlist.append(addr[1])
+        
 
     conn.close()
 
@@ -56,7 +61,7 @@ def main():
         conn, addr = server.accept()
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
-        #print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
+        print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
         
         
         nb_clients = threading.active_count() - 1
