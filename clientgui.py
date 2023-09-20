@@ -46,18 +46,24 @@ class Entity():
         self.draw()
             
 player = Player(0,0)
-
+firstquit = 1
 # Game loop.
 def run():
-    
+    global firstquit
+    msgtosend = ""
     
     
     xtosend,ytosend = player.x, player.y
     for event in pygame.event.get():
         if event.type == QUIT:
-            client.send("quit".encode(FORMAT))
-            pygame.quit()
-            sys.exit()
+            msgtosend = "quit"
+            
+            
+            if firstquit == 1:
+                firstquit = 0
+            else:
+                pygame.quit()
+                sys.exit()
     
 
     
@@ -70,4 +76,4 @@ def run():
     
     pygame.display.flip()
     fpsClock.tick(fps)
-    return xtosend,ytosend
+    return xtosend,ytosend,msgtosend

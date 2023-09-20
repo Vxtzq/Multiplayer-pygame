@@ -1,6 +1,6 @@
 import socket
 import threading
-import wikipedia
+
 
 IP = socket.gethostbyname(socket.gethostname())
 PORT = 5566
@@ -18,8 +18,13 @@ def handle_client(conn, addr):
     connected = True
     while connected:
         msg = conn.recv(SIZE).decode(FORMAT)
-        if msg == DISCONNECT_MSG:
+        if msg == "quit":
             connected = False
+            index = 0
+            for clientpos in clientposes:
+                if clientpos[0] == addr[1]:
+                    del clientposes[index]
+                index += 1
         if msg != "":
             
             if str(msg)[0] == "c":
@@ -35,16 +40,16 @@ def handle_client(conn, addr):
                     for clientpos in clientposes:
                         if clientpos[0] == addr[1]:
                             clientposes[index] =[addr[1],str(msg)]
-                            print(clientposes)
+                            #print(clientposes)
                             dontadd = 1
                         index += 1
                     if dontadd == 0:
                         clientposes.append([addr[1],str(msg)])
-        #print(str(clientposes))
+            print(str(clientposes))
             if addr[1] in firstconnectionlist:
                 conn.send(bytes(str(clientposes),"utf-8"))
             else:
-                print("sus")
+                #print("sus")
                 conn.send(bytes("first"+str(addr[1]),"utf-8"))
                 firstconnectionlist.append(addr[1])
         
@@ -61,7 +66,7 @@ def main():
         conn, addr = server.accept()
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
-        print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
+        #print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
         
         
         nb_clients = threading.active_count() - 1
